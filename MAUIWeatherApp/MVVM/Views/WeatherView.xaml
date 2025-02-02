@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters ="clr-namespace:MAUIWeatherApp.Converters"
+             x:Class="MAUIWeatherApp.MVVM.Views.WeatherView"
+             xmlns:skia="clr-namespace:SkiaSharp.Extended.UI.Controls;assembly=SkiaSharp.Extended.UI"
+             Title="WeatherView">
+    <ContentPage.Resources>
+        <converters:CodeToWeatherConverter x:Key="CodeToWeatherConverter"/>
+        <converters:CodeToLottieConverter x:Key="CodeToLottieConverter"/>
+    </ContentPage.Resources>
+    <Grid Margin="15" RowDefinitions=".08*,.1*,.5*,.1*,.3*">
+        <Grid>
+            <Frame>
+                <SearchBar Placeholder="Search" VerticalOptions="Center" x:Name="searchBar" SearchCommand="{Binding SearchCommand}" SearchCommandParameter="{Binding Source={x:Reference searchBar},Path=Text}"/>
+            </Frame>
+        </Grid>
+        <VerticalStackLayout Grid.Row="1" Style="{StaticResource MainStackLayouth}">
+            <Label Text="{Binding PlaceName}" Style="{StaticResource Title}"/>
+            <Label Text="{Binding Date,StringFormat='{0:MMMM dd, yyyy}'}"/>
+        </VerticalStackLayout>
+        <skia:SKLottieView Grid.Row="2" RepeatCount="-1" Source="{Binding WeatherData.current.weather_code, Converter={StaticResource CodeToLottieConverter}}"/>
+        <Grid Grid.Row="3" ColumnDefinitions="*,*,*">
+            <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="10">
+                <Label Text="Temp" Style="{StaticResource WeatherTitle}"/>
+                <Label Text="{Binding WeatherData.current.temperature_2m,StringFormat='{0}°C' }" Style="{StaticResource WeatherValue}"/>
+            </VerticalStackLayout>
+            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="10">
+                <Label Text="Wind" Style="{StaticResource WeatherTitle}"/>
+                <Label Text="{Binding WeatherData.current.wind_speed_10m,StringFormat='{0}Km/H'}" Style="{StaticResource WeatherValue}"/>
+            </VerticalStackLayout>
+            <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="10">
+                <Label Text="Weather" Style="{StaticResource WeatherTitle}"/>
+                <Label Text="{Binding WeatherData.current.weather_code, Converter={StaticResource CodeToWeatherConverter}}" Style="{StaticResource WeatherValue}"/>
+            </VerticalStackLayout>
+        </Grid>
+        <CollectionView Grid.Row="4" ItemsSource="{Binding WeatherData.Daily2}">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout ItemSpacing="10" Orientation="Horizontal"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame BackgroundColor="Transparent" BorderColor="White">
+                        <VerticalStackLayout VerticalOptions="Center" Spacing="14">
+                            <skia:SKLottieView HeightRequest="70" WidthRequest="70" Source="{Binding weather_code, Converter={StaticResource CodeToLottieConverter}}" RepeatCount="-1"/>
+                            <Label Text="{Binding time,StringFormat='{0:MMMM dd, yyyy}'}"/>
+                            <Label Text="{Binding temperature_2m_max,StringFormat='{0}Max °C' }" TextColor="Wheat"/>
+                            <Label Text="{Binding temperature_2m_min,StringFormat='{0}min °C'}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>
